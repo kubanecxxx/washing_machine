@@ -99,7 +99,7 @@ int main(void)
         chThdSleepMilliseconds(5);
         inputs_read();
 
-        //_state_machine.task();
+        _state_machine.task();
         sysTime = chVTGetSystemTime();
         shPlay();
         relay_writeall();

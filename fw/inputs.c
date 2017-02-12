@@ -46,6 +46,11 @@ void inputs_read(void)
 
     }
 
+    inputs.b.nezdimat = !inputs.b.nezdimat;
+    inputs.b.temperature = inputs.b.temperature || inputs.b.nezdimat;
+    inputs.b.nezdimat = 0;
+
+    inputs.b.door =  1;
 
 }
 

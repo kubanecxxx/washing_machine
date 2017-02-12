@@ -330,6 +330,17 @@ void Gui::callback_button(const menu_item_t * , event_t event, Gui * instance)
     }
 }
 
+void strkat(char * buffer, uint16_t counter)
+{
+    char temp[10];
+    temp[0] = ' ';
+    temp[1] = ' ';
+    temp[2] = ' ';
+    temp[3] = counter + 1 + '0';
+    temp[4] = 0;
+    strcat(buffer, temp);
+}
+
 void Gui::cb_title(const menu_item_t * , event_t event, Gui * instance)
 {
     if (event == RENDER)
@@ -379,6 +390,12 @@ void Gui::cb_title(const menu_item_t * , event_t event, Gui * instance)
         {
             //instance->render_line("CekaniNaHladinu", 1);
             statemachine::intstance()->_T_alarm_fill.format_remains(buffer);
+            if (s == statemachine::REFILL)
+            {
+                uint16_t cnt = statemachine::intstance()->getRinsingCounter();
+                strkat(buffer, cnt);
+            }
+
             instance->render_line(buffer, 1);
         }
         else if (s == statemachine::HEAT)
@@ -394,12 +411,16 @@ void Gui::cb_title(const menu_item_t * , event_t event, Gui * instance)
         }
         else if (s == statemachine::SPIN_TIME)
         {
+            uint16_t cnt = statemachine::intstance()->getRinsingCounter();
             statemachine::intstance()->_T_spin.format_remains(buffer);
+            strkat(buffer, cnt);
             instance->render_line(buffer, 1);
         }
         else if (s == statemachine::RINSE_TIME)
         {
             statemachine::intstance()->_T_rinse.format_remains(buffer);
+            uint16_t cnt = statemachine::intstance()->getRinsingCounter();
+            strkat(buffer, cnt);
             instance->render_line(buffer, 1);
         }
         else if(s == statemachine::FINAL_SPIN)

@@ -62,6 +62,7 @@ statemachine::statemachine(const parameters_t & pars, const Gui & gui):
     //_rinsing = 0;
 
 
+    _state = START;
 
     alarms.word = 0;
 
@@ -89,10 +90,10 @@ void statemachine::task()
     //timers
     bool t_start = _T_start.task(inputs.b.enc_switch && inputs.b.door, MS2ST(1000));
     bool t_prani = _T_wash.task(_state == WASH_TIME, S2ST(_pars.doba_prani * NASOBITKO));
-    bool t_empty = _T_empty.task(_state == WATER_OUT && !inputs.b.low_level, S2ST(5));
+    bool t_empty = _T_empty.task(_state == WATER_OUT && !inputs.b.low_level, S2ST(30));
     bool t_spin = _T_spin.task(_state == SPIN_TIME, S2ST(_pars.doba_zdimani * NASOBITKO));
     bool t_rinse = _T_rinse.task(_state == RINSE_TIME, S2ST(_pars.doba_machani) * NASOBITKO);
-    bool t_empty2 = _T_empty2.task(_state == FINAL_WATER_OUT && !inputs.b.low_level, S2ST(25));
+    bool t_empty2 = _T_empty2.task(_state == FINAL_WATER_OUT && !inputs.b.low_level, S2ST(30));
     bool t_last_spin = _T_last_spin.task(_state == FINAL_SPIN, S2ST(NASOBITKO*_pars.posledni_zdimani));
 
     if (_state == START && main && t_start)
@@ -175,8 +176,8 @@ void statemachine::task()
     //valve during spin simple sequencer
     bool spin = _state == FINAL_SPIN || _state == SPIN_TIME;
     _final_spin_pump_sub_machine =
-            _T_final_spin_pump.task(spin && !_fspsm2 , MS2ST(15));
-    _fspsm2 = _T_final_spin_pump2.task(spin && _final_spin_pump_sub_machine, MS2ST(60));
+            _T_final_spin_pump.task(spin && !_fspsm2 , S2ST(5));
+    _fspsm2 = _T_final_spin_pump2.task(spin && _final_spin_pump_sub_machine, S2ST(60));
     bool pump = spin && !_final_spin_pump_sub_machine;
 
     outputs.u.heater = ((_state == WASH_TIME || _state == HEAT || _state == WATER)
@@ -197,7 +198,7 @@ void statemachine::task()
         if (_pars.otacky_zdimani == 0)
             s = LOW_SPEED;
 
-        _slow.task(s);
+        _slow.task(s,120,10);
     }
     else if (_state == HEAT)
     {
@@ -231,12 +232,12 @@ void statemachine::reset()
 void statemachine::alarm_processing()
 {
     alarms.names.ohrev_dlouho = _T_alarm_heat.task(_state == HEAT, S2ST(900));
-    alarms.names.napousteni_dlouho = _T_alarm_fill.task(_state == WATER || _state == REFILL, S2ST(120));
+    alarms.names.napousteni_dlouho = _T_alarm_fill.task(_state == WATER || _state == REFILL, S2ST(180));
 
     alarms.names.porucha_hladinomeru = (!inputs.b.low_level && inputs.b.high_level);
 
     alarms.names.vypousteni_dlouho = _T_alarm_empting.task(
-                _state == WATER_OUT || _state == FINAL_WATER_OUT, S2ST(120));
+                _state == WATER_OUT || _state == FINAL_WATER_OUT, S2ST(180));
 
 
     alarms.names.dvere = !inputs.b.door && _state != START;
@@ -244,12 +245,6 @@ void statemachine::alarm_processing()
     alarms.names.fh = !inputs.b.fuse_heat;
     alarms.names.fm = !inputs.b.fuse_motor;
     alarms.names.fz = !inputs.b.fuse_zbytek;
-
-    if (alarms.names.fh || alarms.names.fm || alarms.names.fz)
-    {
-        outputs.status = 0;
-        _state = START;
-    }
 
 }
 

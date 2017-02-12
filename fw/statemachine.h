@@ -60,6 +60,7 @@ public:
     bool _final_spin_pump_sub_machine;
     bool _fspsm2;
 
+
     union
     {
         struct
@@ -108,6 +109,7 @@ public:
     static statemachine * intstance() {return _instance;}
 
 
+    uint16_t getRinsingCounter() const {return _rinsing;}
 
 
 
