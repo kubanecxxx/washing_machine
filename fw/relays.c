@@ -15,6 +15,7 @@
 
 
 relay_status_t outputs;
+relay_status_t outputs_forced;
 
 static void incompatible(void);
 
@@ -98,7 +99,7 @@ void relay_writeall()
 
     for (i = 0; i < RELAY_COUNT; i++) {   
 
-      relay_write(i, (outputs.status >> i) & 1);
+      relay_write(i, (((outputs.status >> i) & 1) || ((outputs_forced.status >> i)) & 1));
     }
 
     outputs.u.valve = v;
@@ -108,7 +109,6 @@ void relay_writeall()
 void relay_init(void) {
   uint8_t i;
   const port_t *p = relays;
-
 
   for (i = 0; i < RELAY_COUNT; i++) {
     palSetPadMode(p->port, p->pin, PAL_MODE_OUTPUT_PUSHPULL);

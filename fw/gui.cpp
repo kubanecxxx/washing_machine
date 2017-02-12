@@ -10,6 +10,7 @@
 #include "inputs.h"
 
 parameters_t params;
+uint16_t manual_screen;
 
 static const menu_item_t menu[] =
 {
@@ -21,12 +22,22 @@ static const menu_item_t menu[] =
 {"Pocet machani", "%2d      ", 1, 10, 1,  Gui::callback_parameter, &params.pocet_machani, 0},
 {"Otacky zdimani", "%3d      ", 0, 1, 1,  Gui::callback_parameter_otacky, &params.otacky_zdimani, 0},    
 {"", "", 0, 100, 10,  Gui::callback_diag, 0 , 0},   //diagnostic screen
+    {"Manualne", "", 0, 1, 1, Gui::callback_manual, 0, 0}, //manual menu
+    {"Zpatky" , "" , 0, 0, 1, Gui::callback_man, 0, 1},
+    {"Ventil" , "" , 0, 1, 1, Gui::callback_man, 0 ,1 },
+    {"Cerpadlo" , "" , 0, 2, 1, Gui::callback_man, 0 ,1 },
+    {"Zamek" , "" , 0, 3, 1, Gui::callback_man, 0 ,1 },
+    {"Motor 1" , "" , 0, 4, 1, Gui::callback_man, 0 ,1 },
+    {"Motor 2" , "" , 0, 5, 1, Gui::callback_man, 0 ,1 },
+    {"Motor 3" , "" , 0, 6, 1, Gui::callback_man, 0 ,1 },
+    {"Topeni" , "" , 0, 7, 1, Gui::callback_man, 0 ,1 },
     //vstupy
 
 {NULL, NULL, 0,0,0,0,0,0xff},
 };
 
-#define INDEX_OF_DIAG 8
+#define INDEX_OF_DIAG 9
+
 
 static const char * alarm_texts[] =
 {
@@ -474,3 +485,74 @@ void Gui::clear_line(uint16_t line)
     LCD_xy(0,line);
     LCD_puts("                ");
 }
+
+void Gui::change_menu(uint16_t new_idx)
+{
+    _return_idx = _idx;
+    _idx = new_idx;
+}
+
+void Gui::return_menu()
+{
+    _idx = _return_idx;
+}
+
+void Gui::callback_manual(const menu_item_t *manual, event_t event, Gui *instance)
+{
+    if (event == RENDER)
+    {
+       instance->render_title();
+       instance->clear_line();
+    }
+
+    if (event == CLICK)
+    {
+        if (statemachine::intstance()->getState() == statemachine::START)
+            instance->change_menu(INDEX_OF_DIAG);
+    }
+}
+
+
+void Gui::callback_man(const menu_item_t *item, event_t event, Gui *instance)
+{
+    if (event == RENDER)
+    {
+        instance->render_title();
+        instance->clear_line();
+    }
+
+    if (event == CLICK)
+    {
+    switch (item->high_limit)
+    {
+    case 0:
+        outputs_forced.status = 0;
+        instance->return_menu();
+        break;
+    case 1:
+        outputs_forced.u.valve = !outputs_forced.u.valve;
+        break;
+    case 2:
+        //invert(pump);
+        outputs_forced.u.pump = !outputs_forced.u.pump;
+        break;
+    case 3:
+        outputs_forced.u.doorlock = !outputs_forced.u.doorlock;
+        break;
+    case 4:
+        outputs_forced.u.motor_slow_l = !outputs_forced.u.motor_slow_l;
+        break;
+    case 5:
+        outputs_forced.u.motor_slow_r = !outputs_forced.u.motor_slow_r;
+        break;
+    case 6:
+        outputs_forced.u.motor_fast = !outputs_forced.u.motor_fast;
+        break;
+    case 7:
+        outputs_forced.u.heater = !outputs_forced.u.heater;
+        break;
+    }
+    }
+}
+
+

@@ -87,11 +87,11 @@ int main(void)
 
     statemachine _state_machine(params, _gui);
 
-    /*
+
     shFillStruct(&dt, blik, NULL, MS2ST(500), PERIODIC);
     shRegisterStruct(&dt);
 
-    */
+
     chThdCreateStatic(&gui_wa,sizeof(gui_wa), LOWPRIO, gui_thread, NULL);
 
 	while (TRUE)
@@ -99,7 +99,7 @@ int main(void)
         chThdSleepMilliseconds(5);
         inputs_read();
 
-  //      _state_machine.task();
+        //_state_machine.task();
         sysTime = chVTGetSystemTime();
         shPlay();
         relay_writeall();
@@ -129,7 +129,9 @@ void mcu_init(void)
 
 void blik(void * a)
 {
-    outputs.u.res ^= 1;
+    return;
+    if (!_gui.atMainScreen())
+        outputs_forced.u.motor_fast ^= 1;
 }
 
 void test(void)

@@ -244,6 +244,13 @@ void statemachine::alarm_processing()
     alarms.names.fh = !inputs.b.fuse_heat;
     alarms.names.fm = !inputs.b.fuse_motor;
     alarms.names.fz = !inputs.b.fuse_zbytek;
+
+    if (alarms.names.fh || alarms.names.fm || alarms.names.fz)
+    {
+        outputs.status = 0;
+        _state = START;
+    }
+
 }
 
 void seq::task(speed_t speed, uint16_t rotate_time, uint16_t sleep_time)

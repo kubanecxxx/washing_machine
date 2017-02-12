@@ -66,7 +66,7 @@ set (CPPFLAGS
 )
 
 #family or chip
-set (CHIP "STM32F100C8")
+set (CHIP "STM32F100C6")
 #set (CHIP "STM32F407VG")
 #chibios from https://github.com/kubanecxxx/chibios_fork commit hash
 #4e1e344475204f1f255eb6fe78c55527988e502a
@@ -79,7 +79,7 @@ endif()
 set (FLASH_SIZE "32k")
 set (RAM_SIZE "4k")
 
-set (TOOLCHAIN "arm-none-eabi")
+set (TOOLCHAIN "/home/kubanec/toolchain/4_9-2015q2/bin/arm-none-eabi")
 
 
 set(USE_COMMON_LIBRARY 1)

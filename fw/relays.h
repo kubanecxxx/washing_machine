@@ -51,6 +51,7 @@ void relay_stop_motor(void);
 void relay_start_motor(direction_t direction, speed_t speed);
 
 extern relay_status_t outputs;
+extern relay_status_t outputs_forced;
 
 #ifdef __cplusplus
 }
