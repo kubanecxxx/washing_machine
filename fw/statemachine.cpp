@@ -176,7 +176,7 @@ void statemachine::task()
     //valve during spin simple sequencer
     bool spin = _state == FINAL_SPIN || _state == SPIN_TIME;
     _final_spin_pump_sub_machine =
-            _T_final_spin_pump.task(spin && !_fspsm2 , S2ST(5));
+            _T_final_spin_pump.task(spin && !_fspsm2 , S2ST(2));
     _fspsm2 = _T_final_spin_pump2.task(spin && _final_spin_pump_sub_machine, S2ST(60));
     bool pump = spin && !_final_spin_pump_sub_machine;
 
@@ -200,9 +200,9 @@ void statemachine::task()
 
         _slow.task(s,120,10);
     }
-    else if (_state == HEAT)
+    else if (_state == HEAT || (_state == WATER && outputs.u.heater ))
     {
-        _slow.task(LOW_SPEED, 10, 30);
+        _slow.task(LOW_SPEED, 2, 10);
     }
     else
     {
@@ -231,7 +231,7 @@ void statemachine::reset()
 
 void statemachine::alarm_processing()
 {
-    alarms.names.ohrev_dlouho = _T_alarm_heat.task(_state == HEAT, S2ST(900));
+    alarms.names.ohrev_dlouho = _T_alarm_heat.task(_state == HEAT, S2ST(2700));
     alarms.names.napousteni_dlouho = _T_alarm_fill.task(_state == WATER || _state == REFILL, S2ST(180));
 
     alarms.names.porucha_hladinomeru = (!inputs.b.low_level && inputs.b.high_level);

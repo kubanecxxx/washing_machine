@@ -337,7 +337,9 @@ void strkat(char * buffer, uint16_t counter)
     temp[1] = ' ';
     temp[2] = ' ';
     temp[3] = counter + 1 + '0';
-    temp[4] = 0;
+    temp[4] = '/';
+    temp[5] = params.pocet_machani + '0';
+    temp[6] = 0;
     strcat(buffer, temp);
 }
 
@@ -431,6 +433,11 @@ void Gui::cb_title(const menu_item_t * , event_t event, Gui * instance)
         else if (s == statemachine::FINAL_WATER_OUT || s == statemachine::WATER_OUT)
         {
             statemachine::intstance()->_T_alarm_empting.format_remains(buffer);
+            if (s == statemachine::WATER_OUT)
+            {
+                uint16_t cnt = statemachine::intstance()->getRinsingCounter();
+                strkat(buffer, cnt);
+            }
             instance->render_line(buffer, 1);
         }
         else

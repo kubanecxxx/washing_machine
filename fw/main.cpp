@@ -25,8 +25,6 @@
 #include "gui.h"
 #include "statemachine.h"
 
-static void start_watchdog();
-
 systime_t sysTime;
 
 /*
@@ -72,6 +70,22 @@ void gui_thread(void *)
 }
 
 
+void enable_watchdog(void)
+{
+    //setup watchdog
+    DBGMCU->CR |= DBGMCU_CR_DBG_IWDG_STOP;
+    IWDG->KR = 0x5555;
+    IWDG->PR = 6;
+    IWDG->RLR = 0xFFF;
+    IWDG->KR = 0xCCCC;
+}
+
+
+
+void clear_watchdog(void)
+{
+    IWDG->KR = 0xAAAA;
+}
 
 int main(void)
 {
@@ -79,6 +93,7 @@ int main(void)
     chSysInit();
 
     mcu_init();
+    enable_watchdog();
 
     //test();
 
@@ -99,6 +114,7 @@ int main(void)
         chThdSleepMilliseconds(5);
         inputs_read();
 
+        clear_watchdog();
         _state_machine.task();
         sysTime = chVTGetSystemTime();
         shPlay();
