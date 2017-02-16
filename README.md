@@ -4,6 +4,8 @@ Old automatic washing machine electronic controller
 
 This is and old washing machine renovation. The main reason for this project is the old mechanical programmer got cracked and the price for a new one was almost price of a new washing machine.
 
+The project page is hosted on hackaday.io: https://hackaday.io/project/19873-washing-machine-renovation
+
 Machine itself
 ----
 Washing machine type is <b>Ardo A900</b>. It has basic features like:
