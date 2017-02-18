@@ -107,6 +107,12 @@ int main(void)
     shRegisterStruct(&dt);
 
 
+    //inform user the watchdog event occured
+    if (RCC->CSR & RCC_CSR_IWDGRSTF)
+        _gui.change_menu(8);
+    else
+        RCC->CSR |= RCC_CSR_RMVF;
+
     chThdCreateStatic(&gui_wa,sizeof(gui_wa), LOWPRIO, gui_thread, NULL);
 
 	while (TRUE)

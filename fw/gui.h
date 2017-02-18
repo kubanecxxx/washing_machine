@@ -60,8 +60,11 @@ public:
     static void callback_manual(const menu_item_t * manual, event_t event, Gui * intsance);
     static void callback_man(const menu_item_t * item, event_t event, Gui * instance);
     static void cb_title(const menu_item_t * item, event_t event, Gui * intance);
+    static void cb_reset(const menu_item_t * item , event_t event, Gui * instance);
 
     static void par_plus_minus(const menu_item_t * item, event_t event, Gui * intance);
+
+    void change_menu(uint16_t new_idx);
 
 private:
     uint8_t _idx;
@@ -74,7 +77,7 @@ private:
     void render_value();
     void clear_line(uint16_t line = 1);
     void render_line(const char * text, uint16_t line);
-    void change_menu(uint16_t new_idx);
+
     void return_menu();
 
     uint8_t next() const;
