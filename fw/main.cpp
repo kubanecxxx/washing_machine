@@ -108,7 +108,8 @@ int main(void)
 
 
     //inform user the watchdog event occured
-    if (RCC->CSR & RCC_CSR_IWDGRSTF)
+    if (RCC->CSR & (RCC_CSR_IWDGRSTF | RCC_CSR_WWDGRSTF
+                   ))
         _gui.change_menu(8);
     else
         RCC->CSR |= RCC_CSR_RMVF;
@@ -120,6 +121,7 @@ int main(void)
         chThdSleepMilliseconds(5);
         inputs_read();
 
+        //if (chVTGetSystemTime() < S2ST(10))
         clear_watchdog();
         _state_machine.task();
         sysTime = chVTGetSystemTime();

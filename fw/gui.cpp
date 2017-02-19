@@ -22,7 +22,7 @@ static const menu_item_t menu[] =
 {"Pocet machani", "%2d      ", 1, 10, 1,  Gui::callback_parameter, &params.pocet_machani, 0},
 {"Otacky zdimani", "%3d      ", 0, 1, 1,  Gui::callback_parameter_otacky, &params.otacky_zdimani, 0},    
 {"", "", 0, 100, 10,  Gui::callback_diag, 0 , 0},   //diagnostic screen
-    {"Samovolny reset", "", 0, 1, 1 , Gui::cb_reset, 0, 0},  //8
+    {"Samovolny reset", "%X", 0, 1, 1 , Gui::cb_reset, 0, 0},  //8
     {"Manualne", "", 0, 1, 1, Gui::callback_manual, 0, 0}, //manual menu
     {"Zpatky" , "" , 0, 0, 1, Gui::callback_man, 0, 1}, //10
     {"Ventil" , "" , 0, 1, 1, Gui::callback_man, 0 ,1 },
@@ -545,9 +545,11 @@ void Gui::cb_reset(const menu_item_t *item, event_t event, Gui *instance)
 {
     if (event == RENDER)
     {
-        instance->return_menu();
-        uint8_t watchdog = (RCC->CSR & RCC_CSR_IWDGRSTF);
-        instance->render_value(watchdog);
+        instance->render_title();
+        uint32_t watchdog = (RCC->CSR) ;
+        char buff [20];
+        chsprintf(buff, "%08X", watchdog);
+        instance->render_line(buff, 1);
 
     }
 }
