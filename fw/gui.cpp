@@ -15,6 +15,7 @@ uint16_t manual_screen;
 static const menu_item_t menu[] =
 {
 {"Hlavni", NULL, 0,100,10,  Gui::cb_title, NULL,  0},
+{"Zdimani", NULL, 0,100,10,  Gui::cb_title, NULL,  0},
 {"Doba prani", "%3d minut", 0, 100, 5,  Gui::callback_parameter, &params.doba_prani, 0},
 {"Doba machani", "%3d minut", 0, 100, 2,  Gui::callback_parameter, &params.doba_machani, 0},
 {"Doba zdimani", "%3d minut", 0, 100, 2,  Gui::callback_parameter, &params.doba_zdimani, 0},
@@ -37,7 +38,7 @@ static const menu_item_t menu[] =
 {NULL, NULL, 0,0,0,0,0,0xff},
 };
 
-#define INDEX_OF_DIAG 10
+#define INDEX_OF_DIAG 11
 
 
 static const char * alarm_texts[] =
@@ -385,9 +386,20 @@ void Gui::cb_title(const menu_item_t * , event_t event, Gui * instance)
         else if (s == statemachine::START)
         {
             if (!inputs.b.door)
+            {
                 instance->render_line("Zavrit dvere",1);
+            }
             else
-                instance->render_line("Stiskni tlacitko", 1);
+            {
+                if (instance->atSpinScreen())
+                {
+                    instance->render_line("Zdimani->start" , 1);
+                }
+                else
+                {
+                    instance->render_line("Stiskni tlacitko", 1);
+                }
+            }
         }
         else if (s == statemachine::WATER || s == statemachine::REFILL)
         {

@@ -26,6 +26,8 @@ public:
     seq();
     void task(speed_t speed, uint16_t rotate_time = 60, uint16_t sleep_time = 15);
     void reset();
+
+    void slow_startup();
 private:
     ton _tleft;
     ton _toff;

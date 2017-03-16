@@ -86,6 +86,7 @@ statemachine::statemachine(const parameters_t & pars, const Gui & gui):
 void statemachine::task()
 {
     bool main = _gui.atMainScreen();
+    bool spin_screen = _gui.atSpinScreen();
 
     //timers
     bool t_start = _T_start.task(inputs.b.enc_switch && inputs.b.door, MS2ST(1000));
@@ -99,6 +100,13 @@ void statemachine::task()
     if (_state == START && main && t_start)
     {
         _state = WATER;
+        _rinsing = 0;
+        _forced = false;
+    }
+
+    if (_state == START && spin_screen && t_start)
+    {
+        _state = FINAL_SPIN;
         _rinsing = 0;
         _forced = false;
     }
@@ -168,7 +176,7 @@ void statemachine::task()
         _forced = true;
     }
 
-    if (_T_reset2.task(main && inputs.b.enc_switch, S2ST(15)))
+    if (_T_reset2.task(inputs.b.enc_switch, S2ST(15)))
     {
         reset();
     }
@@ -176,8 +184,8 @@ void statemachine::task()
     //valve during spin simple sequencer
     bool spin = _state == FINAL_SPIN || _state == SPIN_TIME;
     _final_spin_pump_sub_machine =
-            _T_final_spin_pump.task(spin && !_fspsm2 , S2ST(2));
-    _fspsm2 = _T_final_spin_pump2.task(spin && _final_spin_pump_sub_machine, S2ST(60));
+            _T_final_spin_pump.task(spin && !_fspsm2 , S2ST(10));
+    _fspsm2 = _T_final_spin_pump2.task(spin && _final_spin_pump_sub_machine, S2ST(15));
     bool pump = spin && !_final_spin_pump_sub_machine;
 
     outputs.u.heater = ((_state == WASH_TIME || _state == HEAT || _state == WATER)
@@ -198,7 +206,10 @@ void statemachine::task()
         if (_pars.otacky_zdimani == 0)
             s = LOW_SPEED;
 
-        _slow.task(s,120,10);
+        if (s == LOW_SPEED)
+            _slow.task(s,120,10);
+        else
+            _slow.slow_startup();
     }
     else if (_state == HEAT || (_state == WATER && outputs.u.heater ))
     {
@@ -282,6 +293,31 @@ void seq::task(speed_t speed, uint16_t rotate_time, uint16_t sleep_time)
     else if (_state == 3)
     {
         relay_stop_motor();
+    }
+}
+
+void seq::slow_startup()
+{
+    if (_tleft.task(_state == 0, S2ST(30)))
+    {
+        _state = 1;
+    }
+    if (_toff.task(_state == 1, MS2ST(100)))
+    {
+        _state = 2;
+    }
+
+    if (_state == 0)
+    {
+        relay_start_motor(RIGHT, LOW_SPEED);
+    }
+    else if (_state == 1)
+    {
+        relay_stop_motor();
+    }
+    else if (_state == 2)
+    {
+        relay_start_motor(RIGHT,HIGH_SPEED);
     }
 }
 

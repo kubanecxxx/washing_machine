@@ -51,6 +51,7 @@ public:
     Gui();
     void task();
     bool atMainScreen() const {return _idx == 0; }
+    bool atSpinScreen() const {return _idx == 1; }
 
     static void callback_parameter(const menu_item_t * item, event_t event, Gui * intance);
     static void callback_parameter_otacky(const menu_item_t * item, event_t event, Gui * intance);
